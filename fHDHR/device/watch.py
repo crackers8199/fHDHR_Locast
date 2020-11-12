@@ -1,5 +1,6 @@
 import subprocess
 import time
+import m3u8
 
 from fHDHR.exceptions import TunerError
 
@@ -41,6 +42,19 @@ class WatchStream():
 
     def ffmpeg_stream(self, stream_args, tunernum):
 
+        playlist = m3u8.load(str(stream_args["channelUri"]))
+        if playlist.is_variant:
+            # locast variant should be in the format ../variant/playlist.m3u8
+            #    we need to strip the dots and connect it to up one level of the main uri
+            variant_uri = str(playlist.playlists[-1].uri).split('/', 1)[1]
+            main_uri = str(stream_args["channelUri"]).rsplit('/', 2)[0]
+            uri = main_uri + '/' + variant_uri
+        else:
+            uri = stream_args["channelUri"]
+
+        self.fhdhr.logger.info(uri)
+        stream_args["channelUri"] = uri
+        
         bytes_per_read = int(self.fhdhr.config.dict["ffmpeg"]["bytes_per_read"])
 
         ffmpeg_command = self.transcode_profiles(stream_args)

@@ -49,11 +49,10 @@ class WatchStream():
             variant_uri = str(playlist.playlists[-1].uri).split('/', 1)[1]
             main_uri = str(stream_args["channelUri"]).rsplit('/', 2)[0]
             uri = main_uri + '/' + variant_uri
-        else:
-            uri = stream_args["channelUri"]
 
-        self.fhdhr.logger.info(uri)
-        stream_args["channelUri"] = uri
+            self.fhdhr.logger.info('correcting variant playlist uri...')
+            self.fhdhr.logger.info(uri)
+            stream_args["channelUri"] = uri
         
         bytes_per_read = int(self.fhdhr.config.dict["ffmpeg"]["bytes_per_read"])
 
